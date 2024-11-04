@@ -71,6 +71,8 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('t'):
         print("Tomando foto...")
         embedding = DeepFace.represent(frame, model_name=model_name)[0]["embedding"]
+        #embedding = DeepFace.represent(frame, model_name=model_name)
+
         print(embedding)
 
         # Ingresar el nombre para guardar el archivo
