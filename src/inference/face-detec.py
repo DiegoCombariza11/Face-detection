@@ -1,5 +1,17 @@
 import cv2
 from deepface import DeepFace
+import json
+import os
+import numpy as np
+from scipy.spatial.distance import cosine, euclidean
+
+# Primero cargamos el modelo para que no tarde tanto
+model_name = "Facenet"
+
+# Cargamos el json con las caras
+with open("face_data.json", "r") as json_file:
+    embeddings = json.load(json_file)
+
 
 # Inicializar la cámara
 cap = cv2.VideoCapture(0)
@@ -27,17 +39,65 @@ while True:
     # Salir si se presiona 'q'
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-    # Detecta y obtiene el embedding usando FaceNet preentrenado
 
-    #Tomar la foto de la cámara
+    # Presionar 'r' para capturar y reconocer el rostro
+    if cv2.waitKey(1) & 0xFF == ord('r'):
+        print("Reconociendo rostro...")
+        embedding_real_time = DeepFace.represent(frame, model_name=model_name)[0]["embedding"]
+
+        # Convertir el embedding en un vector numpy
+        embedding_real_time = np.array(embedding_real_time).flatten()
+
+        # Comparar el embedding con los embeddings almacenados
+        recognized_name = "Desconocido"  # Si no hay coincidencia, será "Desconocido"
+        min_distance = float("inf")  # Inicializa con un valor alto
+
+        for person in embeddings:
+            stored_embedding = np.array(person["embedding"])
+            # Calcula la distancia coseno o euclidiana
+            distance = cosine(embedding_real_time, stored_embedding)  # Distancia de coseno
+            # Alternativamente, puedes usar la distancia euclidiana:
+            # distance = euclidean(embedding_real_time, stored_embedding)
+
+            # Si la distancia es menor al umbral, es una coincidencia
+            if distance < 0.5:  # Ajusta el umbral según la precisión deseada
+                recognized_name = person["name"]
+                min_distance = distance
+                break  # Deja de buscar si ya encontró una coincidencia
+
+        print(f"Persona reconocida: {recognized_name} (Distancia: {min_distance})")
+
+    # Tomar la foto de la cámara con la tecla 't'
     if cv2.waitKey(1) & 0xFF == ord('t'):
-        embedding = DeepFace.represent(frame, model_name="Facenet")
+        print("Tomando foto...")
+        embedding = DeepFace.represent(frame, model_name=model_name)[0]["embedding"]
         print(embedding)
-        break
 
+        # Ingresar el nombre para guardar el archivo
+        name = input("Ingrese el nombre de la persona: ")
 
-# Aquí puedes almacenar el embedding o compararlo con otros en tu base de datos
+        # Creamos nuestro formato
+        face_data = {
+            "name": name,
+            "embedding": embedding
+        }
 
+        json_path = "face_data.json"
+
+        if os.path.exists(json_path):
+            with open(json_path, "r") as json_file:
+                data = json.load(json_file)
+            data.append(face_data)
+        else:
+            data = []
+            data.append(face_data)
+
+        # Guardamos el json
+        with open(json_path, "w") as json_file:
+            json.dump(data, json_file, indent=4)
+
+        # Salimos del bucle
+      
 
 # Liberar la cámara y cerrar ventanas
 cap.release()
