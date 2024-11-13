@@ -50,7 +50,7 @@ while True:
 
         # Comparar el embedding con los embeddings almacenados
         recognized_name = "Desconocido"  # Si no hay coincidencia, será "Desconocido"
-        min_distance = float("inf")  # Inicializa con un valor alto
+        min_distance = float("inf") 
 
         for person in embeddings:
             stored_embedding = np.array(person["embedding"])
