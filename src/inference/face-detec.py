@@ -5,7 +5,7 @@ import os
 import numpy as np
 from scipy.spatial.distance import cosine, euclidean
 
-# Primero cargamos el modelo para que no tarde tanto
+# Primero cargamos el modelo pra que no tarde tanto
 model_name = "Facenet"
 
 # Cargamos el json con las caras
@@ -57,6 +57,8 @@ while True:
             # Calcula la distancia coseno o euclidiana
             distance = cosine(embedding_real_time, stored_embedding)  # Distancia con coseno
     
+    # la uclidiana no es tan buena como la coseno pq la euclidiana es sensible a la magnitud de los vectores, y 
+    # estos vectores pueede que no sean de la misma magnitud
             # distance = euclidean(embedding_real_time, stored_embedding)
 
             # Si la distancia es menor al umbral, es una coincidencia
