@@ -55,15 +55,15 @@ while True:
         for person in embeddings:
             stored_embedding = np.array(person["embedding"])
             # Calcula la distancia coseno o euclidiana
-            distance = cosine(embedding_real_time, stored_embedding)  # Distancia de coseno
-            # Alternativamente, puedes usar la distancia euclidiana:
+            distance = cosine(embedding_real_time, stored_embedding)  # Distancia con coseno
+    
             # distance = euclidean(embedding_real_time, stored_embedding)
 
             # Si la distancia es menor al umbral, es una coincidencia
             if distance < 0.5:  # Ajusta el umbral según la precisión deseada
                 recognized_name = person["name"]
                 min_distance = distance
-                break  # Deja de buscar si ya encontró una coincidencia
+                break  # para si ya encontró una coincidencia
 
         print(f"Persona reconocida: {recognized_name} (Distancia: {min_distance})")
 
